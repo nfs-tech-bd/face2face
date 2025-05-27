@@ -1,0 +1,6 @@
+version: 2
+authtoken: <norok-token>
+tunnels:
+  my_https_tunnel:
+    proto: http
+    addr: "https://localhost:8443"

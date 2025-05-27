@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face2Face | Next-Gen Video Conferencing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Exo 2"', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            primary: '#7f5af0',
+                            secondary: '#2cb67d',
+                            accent: '#0ea5e9',
+                            pink: '#e94584',
+                            dark: '#16161a',
+                            light: '#fffffe',
+                            gray: '#94a1b2'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'neon-glow': 'neon-glow 1.5s ease-in-out infinite alternate',
+                        'background-pan': 'background-pan 15s linear infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        'neon-glow': {
+                            '0%': { 'text-shadow': '0 0 5px #7f5af0, 0 0 10px #7f5af0, 0 0 15px #7f5af0' },
+                            '100%': { 'text-shadow': '0 0 10px #7f5af0, 0 0 20px #7f5af0, 0 0 30px #7f5af0' },
+                        },
+                        'background-pan': {
+                            '0%': { 'background-position': '0% center' },
+                            '100%': { 'background-position': '200% center' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            background-color: #16161a;
+            color: #fffffe;
+            overflow-x: hidden;
+        }
+        
+        .glass-card {
+            background: rgba(30, 30, 40, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(127, 90, 240, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .neon-input {
+            background: rgba(20, 20, 25, 0.7);
+            border: 1px solid rgba(127, 90, 240, 0.3);
+            transition: all 0.3s ease;
+            color: #fffffe;
+        }
+        
+        .neon-input:focus {
+            border-color: rgba(127, 90, 240, 0.8);
+            box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.3);
+            background: rgba(20, 20, 25, 0.9);
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, #7f5af0 0%, #2cb67d 70%);
+            background-size: 200% auto;
+            position: relative;
+            overflow: hidden;
+            color: #fffffe;
+            transition: all 0.3s ease;
+        }
+        
+        .primary-btn:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(127, 90, 240, 0.3);
+        }
+        
+        .secondary-btn {
+            background: rgba(30, 30, 40, 0.6);
+            border: 1px solid rgba(127, 90, 240, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .secondary-btn:hover {
+            background: rgba(127, 90, 240, 0.1);
+            border: 1px solid rgba(127, 90, 240, 0.6);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 8px rgba(127, 90, 240, 0.5);
+        }
+        
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+        
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            background: #7f5af0;
+            top: 10%;
+            left: 5%;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .shape-2 {
+            width: 300px;
+            height: 300px;
+            background: #2cb67d;
+            top: 70%;
+            left: 20%;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+        
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: #0ea5e9;
+            top: 20%;
+            left: 80%;
+            animation: float 30s ease-in-out infinite;
+        }
+        
+        .shape-4 {
+            width: 350px;
+            height: 350px;
+            background: #e94584;
+            top: 60%;
+            left: 60%;
+            animation: float 35s ease-in-out infinite reverse;
+        }
+        
+        /* Password strength meter styles */
+        .strength-meter {
+            height: 3px;
+            margin-top: 8px;
+            background: rgba(148, 161, 178, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .strength-meter::after {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 0;
+            background: #2cb67d;
+            transition: width 0.3s ease;
+        }
+        
+        .strength-meter.weak::after {
+            width: 30%;
+            background: #ef4444;
+        }
+        
+        .strength-meter.medium::after {
+            width: 60%;
+            background: #f59e0b;
+        }
+        
+        .strength-meter.strong::after {
+            width: 100%;
+            background: #2cb67d;
+        }
+        
+        /* Custom checkbox */
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #7f5af0;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox.checked {
+            background-color: #7f5af0;
+        }
+        
+        .custom-checkbox:hover {
+            transform: scale(1.05);
+        }
+        
+        
+        /* Animated gradient border */
+        .gradient-border {
+            position: relative;
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 8px;
+            padding: 2px;
+            background: linear-gradient(135deg, #7f5af0, #2cb67d, #0ea5e9);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Floating background shapes -->
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <div class="relative inline-block mb-6">
+                <div class="absolute inset-0 rounded-full bg-gradient-to-r from-neon-primary via-neon-accent to-neon-secondary blur-lg opacity-70 animate-neon-glow"></div>
+                <div class="relative w-24 h-24 rounded-full bg-neon-dark flex items-center justify-center text-neon-light text-3xl shadow-lg">
+                    <i class="fas fa-video"></i>
+                </div>
+            </div>
+            <h1 class="text-5xl font-bold mb-3 bg-gradient-to-r from-neon-primary via-neon-accent to-neon-secondary bg-clip-text text-transparent">
+                Face2Face
+            </h1>
+            <p class="text-neon-gray text-lg max-w-md mx-auto">
+                Next-generation video conferencing with end-to-end encryption and crystal clear quality
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex justify-center">
+            <div class="gradient-border">
+                <div class="glass-card rounded-lg p-8 w-full max-w-lg relative overflow-hidden">
+                    <h2 class="text-2xl font-semibold mb-8 text-center bg-gradient-to-r from-neon-primary to-neon-secondary bg-clip-text text-transparent">
+                        Join Your Meeting
+                    </h2>
+                    
+                    <!-- Input Fields -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-neon-gray">Your Name</label>
+                            <div class="relative">
+                                <input id="userName" type="text" placeholder="Enter your name" 
+                                       class="neon-input w-full rounded-lg px-5 py-3 focus:outline-none pl-10">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-neon-primary">
+                                    <i class="far fa-user"></i>
+                                </div>
+                            </div>
+                            
+                            
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-neon-gray">Room ID</label>
+                            <div class="relative">
+                                <input id="roomId" type="text" placeholder="Enter room ID or leave empty to create new" 
+                                       class="neon-input w-full rounded-lg px-5 py-3 focus:outline-none pl-10">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-neon-primary">
+                                    <i class="fas fa-hashtag"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <label class="block text-sm font-medium mb-2 text-neon-gray">Room Password <span class="text-xs text-neon-gray opacity-70">(optional)</span></label>
+                                <div class="text-xs text-neon-gray opacity-70">8+ characters recommended</div>
+                            </div>
+                            <div class="relative">
+                                <input id="roomPassword" type="password" placeholder="Enter password if required" 
+                                       class="neon-input w-full rounded-lg px-5 py-3 focus:outline-none pl-10 pr-10">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-neon-primary">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 text-neon-gray hover:text-neon-light cursor-pointer" 
+                                     id="togglePassword">
+                                    <i class="far fa-eye" id="toggleIcon"></i>
+                                </div>
+                            </div>
+                            <div class="strength-meter" id="strengthMeter"></div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="relative">
+                                <div class="custom-checkbox mr-3" id="rememberCheck">
+                                    <i class="fas fa-check text-xs text-white opacity-0 transition-opacity"></i>
+                                </div>
+                            </div>
+                            <label class="text-sm text-neon-gray cursor-pointer" for="rememberCheck">Remember my name</label>
+                        </div>
+                        
+                        <div class="pt-2">
+                            <div class="flex items-center mb-4">
+                                <div class="custom-checkbox mr-3" id="termsCheck">
+                                    <i class="fas fa-check text-xs text-white opacity-0 transition-opacity"></i>
+                                </div>
+                                <label class="text-sm text-neon-gray cursor-pointer" for="termsCheck">
+                                    I agree to the <a href="#" class="text-neon-secondary hover:underline">Terms of Service</a> and <a href="#" class="text-neon-secondary hover:underline">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col space-y-4 mt-8">
+                            <button id="joinRoom" class="primary-btn rounded-lg px-6 py-4 font-semibold flex items-center justify-center space-x-3">
+                                <i class="fas fa-phone-alt"></i>
+                                <span>Join Meeting</span>
+                            </button>
+                            
+                            <button id="createRoom" class="secondary-btn rounded-lg px-6 py-4 font-semibold flex items-center justify-center space-x-3">
+                                <i class="fas fa-plus"></i>
+                                <span>Create New Room</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t border-neon-dark text-center">
+                        <p class="text-sm text-neon-gray flex items-center justify-center">
+                            <i class="fas fa-lock text-xs mr-2 text-neon-secondary"></i>
+                            All meetings are end-to-end encrypted for maximum privacy
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center text-neon-gray text-sm">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="https://github.com/nfs-tech-bd/face2face" class="hover:text-neon-primary transition transform hover:-translate-y-1">
+                    <i class="fab fa-github text-lg"></i>
+                </a>
+                <a href="https://0xnafissec.pages.dev" class="hover:text-neon-accent transition transform hover:-translate-y-1">
+                    <i class="fa-brands fa-dev"></i>
+                </a>
+                <a href="@nafisfuad69" class="hover:text-neon-pink transition transform hover:-translate-y-1">
+                    <i class="fab fa-discord text-lg"></i>
+                </a>
+                <a href="https://t.me/Nafisfuad1" class="hover:text-neon-secondary transition transform hover:-translate-y-1">
+                    <i class="fab fa-telegram text-lg"></i>
+                </a>
+				<!-- Footer
+                <a href="#" class="hover:text-neon-primary transition transform hover:-translate-y-1">
+                    <i class="fab fa-youtube text-lg"></i>
+                </a> -->
+            </div>
+            <p>v1.0.0 | © 2025 Face2Face. All rights reserved.</p>
+            <p class="mt-1">
+                Your IP: <span id="clientIp" class="font-medium cursor-pointer hover:text-neon-secondary">Loading...</span>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements
+            const userName = document.getElementById('userName');
+            const roomId = document.getElementById('roomId');
+            const roomPassword = document.getElementById('roomPassword');
+            const togglePassword = document.getElementById('togglePassword');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const joinRoom = document.getElementById('joinRoom');
+            const createRoom = document.getElementById('createRoom');
+            const clientIp = document.getElementById('clientIp');
+            const strengthMeter = document.getElementById('strengthMeter');
+            const rememberCheck = document.getElementById('rememberCheck');
+            const termsCheck = document.getElementById('termsCheck');
+            const avatarOptions = document.querySelectorAll('.avatar-option');
+            
+            // Avatar selection
+            avatarOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    avatarOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+            
+            // Checkbox interaction
+            rememberCheck.addEventListener('click', () => {
+                rememberCheck.classList.toggle('checked');
+                const icon = rememberCheck.querySelector('i');
+                icon.classList.toggle('opacity-0');
+            });
+            
+            termsCheck.addEventListener('click', () => {
+                termsCheck.classList.toggle('checked');
+                const icon = termsCheck.querySelector('i');
+                icon.classList.toggle('opacity-0');
+            });
+            
+            // Toggle password visibility
+            togglePassword.addEventListener('click', () => {
+                const isPassword = roomPassword.type === 'password';
+                roomPassword.type = isPassword ? 'text' : 'password';
+                toggleIcon.className = isPassword ? 'far fa-eye-slash' : 'far fa-eye';
+                
+                // Add feedback animation
+                togglePassword.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    togglePassword.style.transform = 'scale(1)';
+                }, 200);
+            });
+            
+            // Password strength meter
+            roomPassword.addEventListener('input', () => {
+                const password = roomPassword.value;
+                let strength = 0;
+                
+                if (!password) {
+                    strengthMeter.className = 'strength-meter';
+                    return;
+                }
+                
+                // Length check
+                if (password.length >= 8) strength += 1;
+                if (password.length >= 12) strength += 1;
+                
+                // Character diversity
+                if (/[A-Z]/.test(password)) strength += 1;
+                if (/[0-9]/.test(password)) strength += 1;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                
+                // Update meter
+                if (strength < 3) {
+                    strengthMeter.className = 'strength-meter weak';
+                } else if (strength < 5) {
+                    strengthMeter.className = 'strength-meter medium';
+                } else {
+                    strengthMeter.className = 'strength-meter strong';
+                }
+            });
+            
+            // Fetch and display the user's IP
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    clientIp.textContent = data.ip;
+                    clientIp.addEventListener('click', () => {
+                        navigator.clipboard.writeText(data.ip).then(() => {
+                            const originalText = clientIp.textContent;
+                            clientIp.textContent = 'Copied!';
+                            clientIp.classList.add('text-neon-secondary');
+                            setTimeout(() => {
+                                clientIp.textContent = originalText;
+                                clientIp.classList.remove('text-neon-secondary');
+                            }, 2000);
+                        });
+                    });
+                })
+                .catch(() => {
+                    clientIp.textContent = 'Unavailable';
+                });
+            
+            // Set default username if available
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                userName.value = savedUsername;
+                rememberCheck.classList.add('checked');
+                rememberCheck.querySelector('i').classList.remove('opacity-0');
+            }
+            
+            // Create new room
+            createRoom.addEventListener('click', () => {
+                if (!userName.value.trim()) {
+                    alert('Please enter your name');
+                    return;
+                }
+                
+                if (!termsCheck.classList.contains('checked')) {
+                    alert('Please agree to the Terms of Service and Privacy Policy');
+                    return;
+                }
+                
+                if (rememberCheck.classList.contains('checked')) {
+                    localStorage.setItem('username', userName.value.trim());
+                }
+                
+                const newRoomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+                let url = `/room/${newRoomId}?name=${encodeURIComponent(userName.value.trim())}`;
+                if (roomPassword.value.trim()) {
+                    url += `&password=${encodeURIComponent(roomPassword.value.trim())}`;
+                }
+                
+                // Get selected avatar
+                const selectedAvatar = document.querySelector('.avatar-option.selected');
+                if (selectedAvatar) {
+                    const avatarColor = selectedAvatar.getAttribute('data-color');
+                    url += `&avatar=${avatarColor}`;
+                }
+                
+                window.location.href = url;
+            });
+            
+            // Join existing room
+            joinRoom.addEventListener('click', () => {
+                if (!userName.value.trim()) {
+                    alert('Please enter your name');
+                    return;
+                }
+                
+                const room = roomId.value.trim();
+                if (!room) {
+                    alert('Please enter a room ID');
+                    return;
+                }
+                
+                if (!termsCheck.classList.contains('checked')) {
+                    alert('Please agree to the Terms of Service and Privacy Policy');
+                    return;
+                }
+                
+                if (rememberCheck.classList.contains('checked')) {
+                    localStorage.setItem('username', userName.value.trim());
+                }
+                
+                let url = `/room/${room}?name=${encodeURIComponent(userName.value.trim())}`;
+                if (roomPassword.value.trim()) {
+                    url += `&password=${encodeURIComponent(roomPassword.value.trim())}`;
+                }
+                
+                // Get selected avatar
+                const selectedAvatar = document.querySelector('.avatar-option.selected');
+                if (selectedAvatar) {
+                    const avatarColor = selectedAvatar.getAttribute('data-color');
+                    url += `&avatar=${avatarColor}`;
+                }
+                
+                window.location.href = url;
+            });
+            
+            // Allow pressing Enter in any field to join
+            [userName, roomId, roomPassword].forEach(field => {
+                field.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') joinRoom.click();
+                });
+            });
+            
+            // Animation effects on hover
+            [joinRoom, createRoom].forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.transform = 'translateY(-3px)';
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Social links hover animation
+            const socialLinks = document.querySelectorAll('footer a');
+            socialLinks.forEach(link => {
+                link.addEventListener('mouseenter', () => {
+                    link.style.transform = 'translateY(-3px)';
+                });
+                link.addEventListener('mouseleave', () => {
+                    link.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Generate a random room ID if empty
+            roomId.addEventListener('focus', () => {
+                if (!roomId.value.trim()) {
+                    setTimeout(() => {
+                        roomId.type = 'text';
+                        roomId.placeholder = 'Generating ID...';
+                        setTimeout(() => {
+                            const newId = Math.random().toString(36).substring(2, 8).toUpperCase();
+                            roomId.value = newId;
+                            roomId.placeholder = 'Enter room ID';
+                        }, 500);
+                    }, 10);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

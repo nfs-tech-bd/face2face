@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Meeting Room</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="room-container">
+        <div class="meeting-header">
+            <div class="meeting-timer" id="meetingTimer">00:00:00</div>
+            <button id="toggleParticipants" class="control-btn" title="Show Participants" style="position:absolute;top:10px;left:10px;z-index:10;">
+                <span style="font-size:1.5rem;">👥</span>
+            </button>
+        </div>
+        <div id="participantPanel" class="participant-panel">
+            <div class="participant-header">
+                <h3>Participants</h3>
+                <button id="closeParticipants" class="close-btn">&times;</button>
+            </div>
+            <div id="hostControls" style="display:none; margin-bottom: 1rem;">
+                <button id="muteAllBtn">Mute All</button>
+            </div>
+            <ul id="participantList" class="participant-list"></ul>
+        </div>
+        <div id="videoContainer" class="video-container">
+            <div class="video-wrapper local-video">
+                <video id="localVideo" autoplay playsinline muted></video>
+                <div class="video-label">{{ user_name }}</div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="toggleVideo" class="control-btn" title="Toggle Video">
+                <img src="/static/img/video-on.svg" alt="Toggle Video">
+            </button>
+            <button id="toggleAudio" class="control-btn" title="Toggle Audio">
+                <img src="/static/img/mic-on.svg" alt="Toggle Audio">
+            </button>
+            <button id="toggleScreen" class="control-btn" title="Share Screen">
+                <img src="/static/img/screen-share.svg" alt="Share Screen">
+            </button>
+            <button id="toggleChat" class="control-btn" title="Toggle Chat">
+                <img src="/static/img/chat.svg" alt="Toggle Chat">
+            </button>
+            <button id="recordBtn" class="control-btn" title="Start Recording">
+                <span id="recordIcon" style="color:red;font-size:1.5rem;">●</span>
+            </button>
+            <span id="recordingIndicator" style="display:none;color:red;font-weight:bold;margin-left:10px;">● Recording...</span>
+            <button id="whiteboardBtn" class="control-btn" title="Open Whiteboard">
+                <span style="font-size:1.5rem;">📝</span>
+            </button>
+            <a href="/" class="control-btn leave" title="Leave Room">
+                <img src="/static/img/leave.svg" alt="Leave">
+            </a>
+        </div>
+        <div id="chatPanel" class="chat-panel">
+            <div class="chat-header">
+                <h3>Chat</h3>
+                <button id="closeChat" class="close-btn">&times;</button>
+            </div>
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input">
+                <input type="file" id="fileInput" style="display:none;">
+                <button id="attachFile" title="Attach File">📎</button>
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="sendMessage">Send</button>
+            </div>
+        </div>
+    </div>
+    <div class="room-info">
+        <p>Room Link: <a id="roomLink" href="/room/{{ room_id }}">{{ request.url.scheme }}://{{ request.url.hostname }}:{{ request.url.port }}/room/{{ room_id }}</a></p>
+        <button id="copyRoomId" class="button">Copy Room Link</button>
+    </div>
+    <div id="whiteboardPanel" class="whiteboard-panel">
+        <div class="whiteboard-header">
+            <span>Whiteboard</span>
+            <button id="closeWhiteboard" class="close-btn">&times;</button>
+        </div>
+        <canvas id="whiteboardCanvas" width="800" height="500"></canvas>
+        <div class="whiteboard-controls">
+            <button id="whiteboardPen">✏️</button>
+            <button id="whiteboardEraser">🧹</button>
+            <button id="whiteboardClear">Clear</button>
+        </div>
+    </div>
+    <script>
+        const ROOM_ID = "{{ room_id }}";
+        const CLIENT_ID = "{{ client_id }}";
+        const USER_NAME = "{{ user_name }}";
+        const LOCAL_IP = "{{ local_ip }}";
+        window.IS_HOST = {% if is_host %}true{% else %}false{% endif %};
+    </script>
+    <script src="/static/js/webrtc.js"></script>
+    <script src="/static/js/ui.js"></script>
+</body>
+</html> 
