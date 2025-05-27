@@ -39,7 +39,7 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile key.pem 
 
 you can access with https://localhost:8443 or your https://<local-ip>:8443
 
-🔐 Privacy Focus
+## 🔐 Privacy Focus
 - All connections are peer-to-peer (no media passes through a server).
 
 - Works fully offline or on intranet networks.
@@ -67,5 +67,5 @@ Tested and working in:
 
 MIT License 
 
-🙌 Contributing
+## 🙌 Contributing
 Pull requests are welcome! If you have ideas for new features or improvements, feel free to open an issue or PR.
