@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/nfs-tech-bd/face2face/refs/heads/main/logo.png"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/nfs-tech-bd/face2face/refs/heads/main/logo.png" height="300" width="300"></p>
 # Face2Face
 
 **Face2Face** is a feature-rich, browser-based video calling platform built using WebRTC and Python. Designed to work seamlessly on local and offline networks, it enables peer-to-peer video conferencing without relying on third-party services or cloud signaling.
